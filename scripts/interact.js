@@ -2,7 +2,7 @@ const hre = require('hardhat');
 
 async function main() {
   const [deployer, user1] = await hre.ethers.getSigners();
-  const contractAddress = '0xc351628EB244ec633d5f21fBD6621e1a683B1181';
+  const contractAddress = '0xC9a43158891282A2B1475592D5719c001986Aaec'; // Adresse du contrat déployé
 
   // Vérifier que l'adresse du contrat est correcte
   if (!contractAddress) {
@@ -30,25 +30,25 @@ async function main() {
   ];
 
   console.log('\n🏗️ Minting de 10 propriétés...');
-  // for (let i = 0; i < properties.length; i++) {
-  //   const { type, location, value, surface } = properties[i];
+  for (let i = 0; i < properties.length; i++) {
+    const { type, location, value, surface } = properties[i];
 
-  //   try {
-  //     const txMint = await realEstate.mintProperty(
-  //       type,
-  //       location,
-  //       value,
-  //       surface,
-  //       `https://fake-documents.com/${i}`,
-  //       `https://fake-images.com/${i}`,
-  //       `https://fake-metadata.com/${i}`,
-  //     );
-  //     await txMint.wait();
-  //     console.log(`✅ Propriété ${i + 1} (${type} à ${location}) mintée !`);
-  //   } catch (error) {
-  //     console.error(`❌ Échec du minting pour ${type} à ${location} :`, error);
-  //   }
-  // }
+    try {
+      const txMint = await realEstate.mintProperty(
+        type,
+        location,
+        value,
+        surface,
+        `https://fake-documents.com/${i}`,
+        `https://fake-images.com/${i}`,
+        `https://fake-metadata.com/${i}`,
+      );
+      await txMint.wait();
+      console.log(`✅ Propriété ${i + 1} (${type} à ${location}) mintée !`);
+    } catch (error) {
+      console.error(`❌ Échec du minting pour ${type} à ${location} :`, error);
+    }
+  }
 
   // Vérifier combien de propriétés ont été mintées
   const totalSupply = await realEstate.totalSupply();
@@ -79,35 +79,6 @@ async function main() {
     console.log(`✅ Propriété ${tokenId} transférée à ${user1.address} !`);
   } catch (error) {
     console.error(`❌ Échec du transfert du bien ${tokenId} :`, error);
-  }
-
-  // 🔹 Échanger des propriétés (3 maisons = 1 gare)
-  console.log('\n🔄 Échange de 3 maisons contre 1 gare...');
-  try {
-    // Mint 3 maisons supplémentaires pour l'échange
-    for (let i = 0; i < 3; i++) {
-      const txMint = await realEstate.mintProperty(
-        'maison',
-        `Ville ${i}`,
-        500000,
-        120,
-        `https://fake-documents.com/house${i}`,
-        `https://fake-images.com/house${i}`,
-        `https://fake-metadata.com/house${i}`,
-      );
-      await txMint.wait();
-      console.log(`✅ Maison ${i + 1} mintée pour l'échange !`);
-    }
-
-    // Récupérer les IDs des 3 maisons
-    const houseIds = [totalSupply, totalSupply + 1, totalSupply + 2];
-
-    // Effectuer l'échange
-    const txExchange = await realEstate.exchangeProperties(houseIds, 'gare');
-    await txExchange.wait();
-    console.log('✅ Échange réussi : 3 maisons ont été échangées contre 1 gare !');
-  } catch (error) {
-    console.error("❌ Échec de l'échange :", error);
   }
 }
 

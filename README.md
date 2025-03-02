@@ -87,6 +87,19 @@ Si tu souhaites déployer sur le testnet Sepolia, assure-toi d'avoir configuré 
 npx hardhat run scripts/deploy.js --network sepolia
 ```
 
+Exécuter le script d’interaction
+Une fois ton contrat déployé, exécute le script pour interagir avec le Smart Contract :
+npx hardhat compile
+npx hardhat run scripts/deploy.js --network localhost
+
+node scripts/interact.js
+
+npx hardhat run scripts/interact.js --network localhost
+
+npx hardhat node
+
+npx hardhat run scripts/deploy.js --network localhost
+
 ---
 
 ## 🧪 5. Tests
