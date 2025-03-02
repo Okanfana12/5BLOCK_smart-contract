@@ -2,7 +2,7 @@ const hre = require('hardhat');
 
 async function main() {
   const [deployer, user1] = await hre.ethers.getSigners();
-  const contractAddress = '0xC9a43158891282A2B1475592D5719c001986Aaec'; // Adresse du contrat déployé
+  const contractAddress = '0x7a2088a1bFc9d81c55368AE168C2C02570cB814F';
 
   // Vérifier que l'adresse du contrat est correcte
   if (!contractAddress) {
@@ -20,14 +20,15 @@ async function main() {
     { type: 'maison', location: 'Paris', value: 500000, surface: 120 },
     { type: 'gare', location: 'Lyon', value: 1000000, surface: 300 },
     { type: 'hotel', location: 'Marseille', value: 2000000, surface: 500 },
-    { type: 'maison', location: 'Bordeaux', value: 600000, surface: 140 },
-    { type: 'gare', location: 'Toulouse', value: 1100000, surface: 320 },
-    { type: 'hotel', location: 'Nice', value: 2500000, surface: 550 },
-    { type: 'maison', location: 'Nantes', value: 550000, surface: 130 },
-    { type: 'gare', location: 'Strasbourg', value: 1200000, surface: 350 },
-    { type: 'hotel', location: 'Lille', value: 2700000, surface: 600 },
-    { type: 'maison', location: 'Rennes', value: 580000, surface: 135 },
+    // { type: 'maison', location: 'Bordeaux', value: 600000, surface: 140 },
+    // { type: 'gare', location: 'Toulouse', value: 1100000, surface: 320 },
+    // { type: 'hotel', location: 'Nice', value: 2500000, surface: 550 },
+    // { type: 'maison', location: 'Nantes', value: 550000, surface: 130 },
+    // { type: 'gare', location: 'Strasbourg', value: 1200000, surface: 350 },
+    // { type: 'hotel', location: 'Lille', value: 2700000, surface: 600 },
+    // { type: 'maison', location: 'Rennes', value: 580000, surface: 135 },
   ];
+
 
   console.log('\n🏗️ Minting de 10 propriétés...');
   for (let i = 0; i < properties.length; i++) {
