@@ -25,6 +25,11 @@ contract RealEstate is ERC721URIStorage, Ownable {
 
     constructor() ERC721("RealEstateToken", "RET") Ownable(msg.sender) {}
 
+    // Fonction interne pour vérifier si un token existe
+    function _exists(uint256 tokenId) internal view returns (bool) {
+        return _ownerOf(tokenId) != address(0);
+    }
+
     modifier cooldownCheck() {
         require(
             block.timestamp > lastTransactionTime[msg.sender] + 5 minutes,
@@ -34,71 +39,79 @@ contract RealEstate is ERC721URIStorage, Ownable {
         lastTransactionTime[msg.sender] = block.timestamp;
     }
 
-      function mintProperty(
-    string memory _propertyType,
-    string memory _location,
-    uint256 _value,
-    uint256 _surface,
-    string memory _documentHash,
-    string memory _imageHash,
-    string memory _metadataURI
-) external onlyOwner {
-    require(
-        keccak256(bytes(_propertyType)) == keccak256(bytes("maison")) ||
-        keccak256(bytes(_propertyType)) == keccak256(bytes("gare")) ||
-        keccak256(bytes(_propertyType)) == keccak256(bytes("hotel")),
-        "Type de bien invalide"
-    );
+    function mintProperty(
+        string memory _propertyType,
+        string memory _location,
+        uint256 _value,
+        uint256 _surface,
+        string memory _documentHash,
+        string memory _imageHash,
+        string memory _metadataURI
+    ) external onlyOwner {
+        require(
+            keccak256(bytes(_propertyType)) == keccak256(bytes("maison")) ||
+            keccak256(bytes(_propertyType)) == keccak256(bytes("gare")) ||
+            keccak256(bytes(_propertyType)) == keccak256(bytes("hotel")),
+            "Type de bien invalide"
+        );
 
-    // 🔥 Vérifier la limite de possession
-    require(ownedProperties[msg.sender] < 40, "Maximum de 4 biens par adresse");
+        // 🔥 Vérifier la limite de possession
+        require(ownedProperties[msg.sender] < 40, "Maximum de 4 biens par adresse");
 
-    properties[nextTokenId] = Property({
-        propertyType: _propertyType,
-        location: _location,
-        value: _value,
-        surface: _surface,
-        documentHash: _documentHash,
-        imageHash: _imageHash,
-        previousOwners: new address[](0),
-        createdAt: block.timestamp,
-        lastTransferAt: block.timestamp
-    });
+        properties[nextTokenId] = Property({
+            propertyType: _propertyType,
+            location: _location,
+            value: _value,
+            surface: _surface,
+            documentHash: _documentHash,
+            imageHash: _imageHash,
+            previousOwners: new address[](0),
+            createdAt: block.timestamp,
+            lastTransferAt: block.timestamp
+        });
 
-    _mint(msg.sender, nextTokenId);
-    _setTokenURI(nextTokenId, _metadataURI);
+        _mint(msg.sender, nextTokenId);
+        _setTokenURI(nextTokenId, _metadataURI);
 
-    // Mettre à jour ownedProperties
-    ownedProperties[msg.sender]++;
+        // Mettre à jour ownedProperties
+        ownedProperties[msg.sender]++;
 
-    nextTokenId++;
+        nextTokenId++;
     }
 
     function totalSupply() external view returns (uint256) {
-    return nextTokenId;
-
+        return nextTokenId;
     }
 
+    function deleteAllProperties() external onlyOwner {
+        require(nextTokenId > 0, unicode"Aucune propriété à supprimer.");
+
+        for (uint256 i = 0; i < nextTokenId; i++) {
+            if (_exists(i)) {
+                _burn(i); // Supprime le NFT
+            }
+            delete properties[i]; // Supprime les détails de la propriété
+        }
+
+        nextTokenId = 0; // Réinitialiser le compteur de mint
+    }
 
     function transferProperty(address to, uint256 tokenId) external cooldownCheck {
-    require(ownerOf(tokenId) == msg.sender, unicode"Vous n'êtes pas le propriétaire de ce bien");
-    require(ownedProperties[to] < 4, "Maximum de 4 biens par adresse");
-    require(ownedProperties[msg.sender] > 0, unicode"Vous ne possédez aucun bien à transférer"); // 🔥 Correction ici
+        require(ownerOf(tokenId) == msg.sender, unicode"Vous n'êtes pas le propriétaire de ce bien");
+        require(ownedProperties[to] < 4, "Maximum de 4 biens par adresse");
+        require(ownedProperties[msg.sender] > 0, unicode"Vous ne possédez aucun bien à transférer"); // 🔥 Correction ici
 
-    _transfer(msg.sender, to, tokenId);
+        _transfer(msg.sender, to, tokenId);
 
-    ownedProperties[msg.sender] = ownedProperties[msg.sender] - 1; // Décrémentation sécurisée
-    ownedProperties[to]++;
+        ownedProperties[msg.sender] = ownedProperties[msg.sender] - 1; // Décrémentation sécurisée
+        ownedProperties[to]++;
 
-    properties[tokenId].previousOwners.push(msg.sender);
-    properties[tokenId].lastTransferAt = block.timestamp;
-}
-
+        properties[tokenId].previousOwners.push(msg.sender);
+        properties[tokenId].lastTransferAt = block.timestamp;
+    }
 
     function getPropertyDetails(uint256 tokenId) external view returns (Property memory) {
         return properties[tokenId];
     }
-
-
-
 }
+
