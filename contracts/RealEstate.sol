@@ -71,11 +71,7 @@ contract RealEstate is ERC721URIStorage, Ownable {
         });
         _mint(msg.sender, nextTokenId);
         _setTokenURI(nextTokenId, _metadataURI);
-
-        // Mettre à jour ownedProperties
-        //ok
         ownedProperties[msg.sender]++;
-
         nextTokenId++;
     }
 
